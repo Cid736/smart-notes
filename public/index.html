@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Smart Notes</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f1117;--surface:#1a1d27;--surface2:#22263a;--border:#2e3248;
+  --accent:#6c63ff;--accent2:#a78bfa;--text:#e2e8f0;--muted:#8892a4;
+  --green:#34d399;--orange:#fb923c;--red:#f87171;
+  font-family:'Segoe UI',system-ui,sans-serif;
+}
+body{background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden}
+/* SIDEBAR */
+#sidebar{width:280px;min-width:280px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column}
+#sidebar-header{padding:20px 16px 12px;border-bottom:1px solid var(--border)}
+#sidebar-header h1{font-size:18px;font-weight:700;color:var(--accent2);margin-bottom:12px}
+#search{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-size:13px;outline:none}
+#search:focus{border-color:var(--accent)}
+#new-btn{width:100%;margin-top:10px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px;font-size:13px;font-weight:600;cursor:pointer;transition:.15s}
+#new-btn:hover{background:var(--accent2)}
+#notes-list{flex:1;overflow-y:auto;padding:8px}
+.note-item{padding:10px 12px;border-radius:8px;cursor:pointer;margin-bottom:4px;border:1px solid transparent;transition:.1s}
+.note-item:hover{background:var(--surface2)}
+.note-item.active{background:var(--surface2);border-color:var(--accent)}
+.note-item-title{font-size:13px;font-weight:600;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-item-excerpt{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.note-item-date{font-size:10px;color:var(--muted);margin-top:4px}
+.empty{padding:24px 12px;text-align:center;color:var(--muted);font-size:13px}
+/* MAIN */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#toolbar{padding:12px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;background:var(--surface)}
+#title-input{flex:1;background:transparent;border:none;font-size:18px;font-weight:700;color:var(--text);outline:none}
+#title-input::placeholder{color:var(--muted)}
+#save-btn{background:var(--green);color:#000;border:none;border-radius:7px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;transition:.15s}
+#save-btn:hover{filter:brightness(1.1)}
+#delete-btn{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:7px;padding:7px 12px;font-size:12px;cursor:pointer;transition:.15s}
+#delete-btn:hover{border-color:var(--red);color:var(--red)}
+#editor-area{flex:1;padding:20px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+#content-input{flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:16px;color:var(--text);font-size:14px;line-height:1.7;resize:none;outline:none;min-height:200px;font-family:inherit}
+#content-input:focus{border-color:var(--accent)}
+/* TAGS */
+#tags-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.tag{background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:3px 10px;font-size:11px;color:var(--accent2);cursor:pointer}
+.tag:hover{border-color:var(--red);color:var(--red)}
+#tag-input{background:transparent;border:none;outline:none;font-size:11px;color:var(--text);width:100px}
+/* AI PANEL */
+#ai-panel{background:var(--surface);border-top:1px solid var(--border);padding:16px 20px}
+#ai-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+#ai-header span{font-size:12px;font-weight:600;color:var(--accent2);letter-spacing:.5px;text-transform:uppercase}
+#summarize-btn{background:var(--accent);color:#fff;border:none;border-radius:7px;padding:6px 14px;font-size:12px;font-weight:600;cursor:pointer;transition:.15s}
+#summarize-btn:hover{background:var(--accent2)}
+#summarize-btn:disabled{opacity:.5;cursor:default}
+#ai-result{display:none;gap:12px}
+#ai-result.show{display:grid;grid-template-columns:1fr 1fr}
+.ai-card{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:12px}
+.ai-card h4{font-size:11px;text-transform:uppercase;color:var(--muted);letter-spacing:.5px;margin-bottom:8px}
+.ai-card p,.ai-card li{font-size:12px;line-height:1.6;color:var(--text)}
+.ai-card ul{padding-left:14px}
+.ai-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.ai-tag{background:var(--surface);border:1px solid var(--accent);border-radius:20px;padding:2px 10px;font-size:11px;color:var(--accent2);cursor:pointer}
+.ai-tag:hover{background:var(--accent);color:#fff}
+#welcome{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--muted);gap:8px}
+#welcome h2{color:var(--text);font-size:22px}
+#welcome p{font-size:14px}
+</style>
+</head>
+<body>
+
+<aside id="sidebar">
+  <div id="sidebar-header">
+    <h1>Smart Notes</h1>
+    <input id="search" type="text" placeholder="Buscar notas…">
+    <button id="new-btn">+ Nueva nota</button>
+  </div>
+  <div id="notes-list"></div>
+</aside>
+
+<main id="main">
+  <div id="welcome">
+    <h2>Smart Notes</h2>
+    <p>Crea o selecciona una nota para empezar</p>
+  </div>
+
+  <div id="editor" style="display:none;flex:1;flex-direction:column;overflow:hidden">
+    <div id="toolbar">
+      <input id="title-input" type="text" placeholder="Título de la nota…">
+      <button id="delete-btn">Eliminar</button>
+      <button id="save-btn">Guardar</button>
+    </div>
+    <div id="editor-area">
+      <textarea id="content-input" placeholder="Escribe aquí tu nota…"></textarea>
+      <div id="tags-row">
+        <span style="font-size:11px;color:var(--muted)">Etiquetas:</span>
+      </div>
+    </div>
+    <div id="ai-panel">
+      <div id="ai-header">
+        <span>Resumen automático</span>
+        <button id="summarize-btn">Analizar nota</button>
+      </div>
+      <div id="ai-result">
+        <div class="ai-card">
+          <h4>Resumen</h4>
+          <p id="ai-summary"></p>
+        </div>
+        <div class="ai-card">
+          <h4>Puntos clave</h4>
+          <ul id="ai-points"></ul>
+          <div class="ai-tags" id="ai-tags"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+let notes = [], currentId = null, tags = [];
+
+const $  = id => document.getElementById(id);
+const qs = s  => document.querySelector(s);
+
+async function api(method, path, body) {
+  const r = await fetch('/api/notes' + path, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body:    body ? JSON.stringify(body) : undefined,
+  });
+  return r.status === 204 ? null : r.json();
+}
+
+async function loadNotes() {
+  notes = await api('GET', '');
+  renderList();
+}
+
+function renderList(list = notes) {
+  const el = $('notes-list');
+  if (!list.length) {
+    el.innerHTML = '<div class="empty">Sin notas. Crea la primera ↑</div>';
+    return;
+  }
+  el.innerHTML = list.map(n => `
+    <div class="note-item${n.id === currentId ? ' active' : ''}" data-id="${n.id}">
+      <div class="note-item-title">${escape(n.title || 'Sin título')}</div>
+      <div class="note-item-excerpt">${escape((n.content || '').slice(0, 60))}</div>
+      <div class="note-item-date">${fmt(n.updated_at)}</div>
+    </div>
+  `).join('');
+  el.querySelectorAll('.note-item').forEach(el =>
+    el.addEventListener('click', () => openNote(+el.dataset.id))
+  );
+}
+
+function escape(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function fmt(dt) {
+  if (!dt) return '';
+  const d = new Date(dt.replace(' ','T') + 'Z');
+  return d.toLocaleDateString('es-ES', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' });
+}
+
+function openNote(id) {
+  const n   = notes.find(x => x.id === id);
+  if (!n) return;
+  currentId = id;
+  tags      = [...(n.tags || [])];
+  $('title-input').value   = n.title;
+  $('content-input').value = n.content;
+  $('welcome').style.display  = 'none';
+  $('editor').style.display   = 'flex';
+  $('ai-result').classList.remove('show');
+  if (n.summary) showAiResult({ summary: n.summary, key_points: n.key_points || [], tags: n.tags || [] });
+  renderTags();
+  renderList();
+}
+
+function renderTags() {
+  const row = $('tags-row');
+  row.innerHTML = '<span style="font-size:11px;color:var(--muted)">Etiquetas:</span>';
+  tags.forEach((t, i) => {
+    const el = document.createElement('span');
+    el.className   = 'tag';
+    el.textContent = t + ' ×';
+    el.onclick = () => { tags.splice(i, 1); renderTags(); };
+    row.appendChild(el);
+  });
+  const inp = document.createElement('input');
+  inp.id          = 'tag-input';
+  inp.placeholder = 'añadir…';
+  inp.className   = '';
+  inp.style       = 'background:transparent;border:none;outline:none;font-size:11px;color:var(--text);width:80px';
+  inp.onkeydown   = e => {
+    if ((e.key === 'Enter' || e.key === ',') && inp.value.trim()) {
+      e.preventDefault();
+      tags.push(inp.value.trim());
+      renderTags();
+    }
+  };
+  row.appendChild(inp);
+}
+
+$('new-btn').onclick = async () => {
+  const n = await api('POST', '', { title: 'Nueva nota', content: '' });
+  notes.unshift(n);
+  openNote(n.id);
+};
+
+$('save-btn').onclick = async () => {
+  if (!currentId) return;
+  const body = { title: $('title-input').value || 'Sin título', content: $('content-input').value, tags };
+  const updated = await api('PUT', `/${currentId}`, body);
+  const idx = notes.findIndex(n => n.id === currentId);
+  if (idx >= 0) notes[idx] = updated;
+  renderList();
+};
+
+$('delete-btn').onclick = async () => {
+  if (!currentId || !confirm('¿Eliminar esta nota?')) return;
+  await api('DELETE', `/${currentId}`);
+  notes = notes.filter(n => n.id !== currentId);
+  currentId = null;
+  $('editor').style.display  = 'none';
+  $('welcome').style.display = 'flex';
+  renderList();
+};
+
+$('summarize-btn').onclick = async () => {
+  if (!currentId) return;
+  const btn = $('summarize-btn');
+  btn.disabled     = true;
+  btn.textContent  = 'Analizando…';
+  try {
+    const result = await api('POST', `/${currentId}/summarize`);
+    showAiResult(result);
+    const idx = notes.findIndex(n => n.id === currentId);
+    if (idx >= 0) notes[idx] = { ...notes[idx], ...result };
+  } finally {
+    btn.disabled    = false;
+    btn.textContent = 'Analizar nota';
+  }
+};
+
+function showAiResult({ summary, key_points = [], tags: aiTags = [] }) {
+  $('ai-summary').textContent = summary || '—';
+  $('ai-points').innerHTML = key_points.map(p => `<li>${escape(p)}</li>`).join('');
+  $('ai-tags').innerHTML = aiTags.map(t =>
+    `<span class="ai-tag" onclick="addTag('${t}')">${escape(t)}</span>`
+  ).join('');
+  $('ai-result').classList.add('show');
+}
+
+window.addTag = (t) => {
+  if (!tags.includes(t)) { tags.push(t); renderTags(); }
+};
+
+$('search').oninput = async e => {
+  const q = e.target.value.trim();
+  renderList(q ? await api('GET', `?q=${encodeURIComponent(q)}`) : notes);
+};
+
+loadNotes();
+</script>
+</body>
+</html>
