@@ -22,6 +22,18 @@ function parse(n) {
   };
 }
 
+const WIKILINK_RE = /\[\[([^\]]+)\]\]/g;
+
+function extractWikiLinks(content) {
+  const links = [];
+  let m;
+  const re = new RegExp(WIKILINK_RE.source, 'g');
+  while ((m = re.exec(content)) !== null) {
+    links.push(m[1].trim().toLowerCase());
+  }
+  return links;
+}
+
 module.exports = {
   create: ({ title, content = '', tags = [] }) =>
     db.prepare("INSERT INTO notes(title,content,tags) VALUES(?,?,?)").run(title, content, JSON.stringify(tags)),
@@ -43,4 +55,30 @@ module.exports = {
 
   search: (q) =>
     db.prepare("SELECT * FROM notes WHERE title LIKE ? OR content LIKE ? ORDER BY updated_at DESC").all(`%${q}%`, `%${q}%`).map(parse),
+
+  getGraph: () => {
+    const all = db.prepare("SELECT id, title, content FROM notes").all();
+    const nodes = all.map(n => ({ id: n.id, title: n.title }));
+    const edges = [];
+    for (const n of all) {
+      const links = extractWikiLinks(n.content);
+      for (const link of links) {
+        const target = all.find(t => t.title.toLowerCase() === link);
+        if (target && target.id !== n.id) {
+          edges.push({ source: n.id, target: target.id });
+        }
+      }
+    }
+    return { nodes, edges };
+  },
+
+  getBacklinks: (id) => {
+    const note = db.prepare("SELECT title FROM notes WHERE id=?").get(id);
+    if (!note) return [];
+    const titleLower = note.title.toLowerCase();
+    const others = db.prepare("SELECT id, title, content FROM notes WHERE id != ?").all(id);
+    return others
+      .filter(n => extractWikiLinks(n.content).includes(titleLower))
+      .map(n => ({ id: n.id, title: n.title }));
+  },
 };
