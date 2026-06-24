@@ -1,6 +1,6 @@
 // Summarization without any external API — pure NLP text extraction
 
-function sentenceScore(sentence, wordFreq, totalWords) {
+function sentenceScore(sentence, wordFreq) {
   const words = tokenize(sentence);
   if (!words.length) return 0;
   return words.reduce((sum, w) => sum + (wordFreq[w] || 0), 0) / words.length;
@@ -36,7 +36,7 @@ function summarize(title, content) {
 
   const scored = sentences.map((s, i) => ({
     text:  s.trim(),
-    score: sentenceScore(s, freq, words.length),
+    score: sentenceScore(s, freq),
     index: i,
   }));
 

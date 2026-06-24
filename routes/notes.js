@@ -4,7 +4,11 @@ const { summarize } = require('../services/ai');
 
 router.get('/graph',      (req, res) => res.json(db.getGraph()));
 router.get('/',           (req, res) => res.json(req.query.q ? db.search(req.query.q) : db.getAll()));
-router.post('/',          (req, res) => { const r = db.create(req.body); res.status(201).json(db.getOne(r.lastInsertRowid)); });
+router.post('/', (req, res) => {
+  if (!req.body.title?.trim()) return res.status(400).json({ error: 'title is required' });
+  const r = db.create(req.body);
+  res.status(201).json(db.getOne(r.lastInsertRowid));
+});
 router.get('/:id',        (req, res) => { const n = db.getOne(req.params.id); n ? res.json(n) : res.status(404).json({ error: 'Not found' }); });
 router.delete('/:id',     (req, res) => { db.delete(req.params.id); res.status(204).end(); });
 router.get('/:id/backlinks', (req, res) => res.json(db.getBacklinks(req.params.id)));
