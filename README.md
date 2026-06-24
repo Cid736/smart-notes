@@ -1,3 +1,11 @@
+<p align="center">
+  <a href="#english">🇬🇧 English</a> &nbsp;·&nbsp; <a href="#español">🇪🇸 Español</a>
+</p>
+
+---
+
+<a name="english"></a>
+
 # Smart Notes
 
 Obsidian-inspired note-taking app with Markdown rendering, [[WikiLinks]], graph view, backlinks, and local AI summarization — no external APIs, runs 100% locally.
@@ -40,3 +48,38 @@ Type `[[Note Title]]` anywhere in your note. In preview mode it renders as a cli
 
 **v0.1.0** — 2026-05-01
 - Initial release: Markdown editor, WikiLinks, graph view, backlinks, AI summarization, tags
+
+---
+
+<a name="español"></a>
+
+# Smart Notes
+
+Aplicación de toma de notas inspirada en Obsidian con renderizado Markdown, [[WikiLinks]], vista de grafo, backlinks y resumen con IA local — sin APIs externas, 100% local.
+
+## Stack
+Node.js · Express · SQLite (better-sqlite3) · Vanilla JS · marked.js
+
+## Características
+- **Editor dividido / vista previa** — escribe Markdown a la izquierda, ve el resultado en tiempo real a la derecha
+- **[[WikiLinks]]** — enlaza notas por nombre; chips morados en la vista previa, clicables para abrir la nota
+- **Vista de grafo** — grafo de fuerzas en canvas con todas las notas y sus conexiones
+- **Panel de backlinks** — ve todas las notas que enlazan a la actual
+- **Barra de herramientas** — H1/H2/H3, Negrita, Cursiva, Código, Bloque de código, Cita, Listas, Lista de tareas, Separador
+- **Guardado automático** — autoguardado con rebote de 1 segundo mientras escribes; Ctrl+S para guardado instantáneo
+- **Resumen con IA** — NLP extractivo (TF-IDF), sin clave de API
+- **Etiquetas** — añade y elimina etiquetas por nota; la IA las sugiere automáticamente
+- **Búsqueda en tiempo real** — filtra la lista de notas mientras escribes
+- **Barra de estado** — contador en vivo de palabras / caracteres / líneas
+- **Barras laterales colapsables** — oculta los paneles para centrarte en escribir
+
+## Instalación
+```bash
+npm install
+npm start
+# Abre http://localhost:3001
+```
+
+## Licencia
+
+MIT
