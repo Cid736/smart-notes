@@ -30,3 +30,13 @@ Uses TF-IDF style sentence scoring to rank and extract the most relevant sentenc
 
 ## How WikiLinks work
 Type `[[Note Title]]` anywhere in your note. In preview mode it renders as a clickable link to that note. The Graph tab shows all connections visually. The Backlinks tab shows which notes point to the current one.
+
+## Changelog
+
+**v0.1.1** — 2026-06-24
+- Fix: POST /notes now returns 400 if title is missing instead of crashing with 500
+- Fix: remove unused `totalWords` parameter in `sentenceScore`
+- Feat: alpha version banner
+
+**v0.1.0** — 2026-05-01
+- Initial release: Markdown editor, WikiLinks, graph view, backlinks, AI summarization, tags

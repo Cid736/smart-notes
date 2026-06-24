@@ -30,3 +30,13 @@ Usa puntuacion de frases estilo TF-IDF para clasificar y extraer las frases mas 
 
 ## Como funcionan los WikiLinks
 Escribe `[[Titulo de la nota]]` en cualquier parte de tu nota. En la vista previa se renderiza como un enlace clicable a esa nota. La pestana Grafo muestra todas las conexiones visualmente. La pestana Backlinks muestra que notas apuntan a la actual.
+
+## Historial de versiones
+
+**v0.1.1** — 2026-06-24
+- Fix: POST /notes devuelve 400 si falta el titulo en lugar de fallar con 500
+- Fix: eliminado parametro `totalWords` no utilizado en `sentenceScore`
+- Novedades: banner de version alfa
+
+**v0.1.0** — 2026-05-01
+- Publicacion inicial: editor Markdown, WikiLinks, vista de grafo, backlinks, resumen IA, etiquetas
