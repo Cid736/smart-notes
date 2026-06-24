@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Smart Notes</title>
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3/dist/purify.min.js"></script>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -470,7 +471,7 @@ function renderMarkdown(raw) {
 
 function updatePreview() {
   const raw = $('content-input').value;
-  $('preview-pane').innerHTML = renderMarkdown(raw);
+  $('preview-pane').innerHTML = DOMPurify.sanitize(renderMarkdown(raw), { ADD_ATTR: ['data-id', 'target'] });
   // Bind wikilink clicks
   $('preview-pane').querySelectorAll('a.wikilink[data-id]').forEach(a => {
     a.onclick = e => { e.preventDefault(); openNote(+a.dataset.id); };
