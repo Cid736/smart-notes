@@ -35,7 +35,6 @@ Escribe `[[Titulo de la nota]]` en cualquier parte de tu nota. En la vista previ
 
 **v0.1.1** — 2026-06-24
 - Fix: POST /notes devuelve 400 si falta el titulo en lugar de fallar con 500
-- Fix: eliminado parametro `totalWords` no utilizado en `sentenceScore`
 - Novedades: banner de version alfa
 
 **v0.1.0** — 2026-05-01
