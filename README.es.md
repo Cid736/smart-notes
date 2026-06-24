@@ -34,8 +34,9 @@ Escribe `[[Titulo de la nota]]` en cualquier parte de tu nota. En la vista previ
 ## Historial de versiones
 
 **v0.1.1** — 2026-06-24
-- Fix: POST /notes devuelve 400 si falta el titulo en lugar de fallar con 500
-- Novedades: banner de version alfa
+- Seguridad: la salida de `marked.parse()` se sanitiza con DOMPurify antes de renderizar — previene XSS desde el contenido de notas
+- Fix: `POST /notes` devuelve 400 si falta el título en lugar de fallar con 500
+- Novedades: banner de versión alfa
 
 **v0.1.0** — 2026-05-01
 - Publicacion inicial: editor Markdown, WikiLinks, vista de grafo, backlinks, resumen IA, etiquetas

@@ -34,7 +34,8 @@ Type `[[Note Title]]` anywhere in your note. In preview mode it renders as a cli
 ## Changelog
 
 **v0.1.1** — 2026-06-24
-- Fix: POST /notes now returns 400 if title is missing instead of crashing with 500
+- Security: `marked.parse()` output sanitized with DOMPurify before rendering — prevents XSS from note content
+- Fix: `POST /notes` now returns 400 if title is missing instead of crashing with 500
 - Feat: alpha version banner
 
 **v0.1.0** — 2026-05-01
