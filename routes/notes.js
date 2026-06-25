@@ -4,6 +4,18 @@ const { summarize } = require('../services/ai');
 
 const MAX_CONTENT_BYTES = 500 * 1024;
 
+const _summarizeCalls = new Map();
+const SUMMARIZE_LIMIT = 10;
+const SUMMARIZE_WINDOW = 60 * 1000;
+function _summarizeRateOk(ip) {
+  const now = Date.now();
+  const hits = (_summarizeCalls.get(ip) || []).filter(t => now - t < SUMMARIZE_WINDOW);
+  if (hits.length >= SUMMARIZE_LIMIT) return false;
+  hits.push(now);
+  _summarizeCalls.set(ip, hits);
+  return true;
+}
+
 router.get('/graph',      (req, res) => res.json(db.getGraph()));
 router.get('/',           (req, res) => res.json(req.query.q ? db.search(req.query.q) : db.getAll()));
 router.post('/', (req, res) => {
@@ -27,6 +39,8 @@ router.put('/:id', (req, res) => {
 });
 
 router.post('/:id/summarize', (req, res) => {
+  const ip = req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
+  if (!_summarizeRateOk(ip)) return res.status(429).json({ error: 'Too many summarize requests' });
   const note = db.getOne(req.params.id);
   if (!note) return res.status(404).json({ error: 'Not found' });
   if (!note.content.trim()) return res.status(400).json({ error: 'Empty note' });
