@@ -92,7 +92,7 @@ npm start
 
 Las revisiones de seguridad automatizadas utilizan [Claude](https://claude.ai) (Anthropic AI) y se ejecutan en cada cambio significativo para detectar vulnerabilidades, patrones inseguros y riesgos en dependencias. Los hallazgos se registran en [`BUGLOG.md`](BUGLOG.md).
 
-**Última revisión:** 2026-06-25 — 3 vulnerabilidades encontradas (1 media, 2 bajas) — todas parcheadas. Configurar API_KEY en .env para activar la autenticación.
+**Última revisión:** 2026-06-25 (rev 3) — 4 vulnerabilidades totales (1 media, 3 bajas) — todas parcheadas. Revisión 3: rate limiter de `/summarize` corregido para entornos con reverse proxy. Configurar API_KEY en .env para activar la autenticación.
 
 ¿Encontraste una vulnerabilidad? Abre un issue o contacta directamente.
 ## Licencia

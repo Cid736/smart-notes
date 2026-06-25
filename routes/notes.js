@@ -39,7 +39,7 @@ router.put('/:id', (req, res) => {
 });
 
 router.post('/:id/summarize', (req, res) => {
-  const ip = req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
+  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
   if (!_summarizeRateOk(ip)) return res.status(429).json({ error: 'Too many summarize requests' });
   const note = db.getOne(req.params.id);
   if (!note) return res.status(404).json({ error: 'Not found' });
