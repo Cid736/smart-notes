@@ -798,9 +798,15 @@ $('summarize-btn').onclick = async () => {
 function showAiResult({ summary, key_points = [], tags: aiTags = [] }) {
   $('ai-summary').textContent  = summary || '—';
   $('ai-points').innerHTML     = key_points.map(p => `<li>${esc(p)}</li>`).join('');
-  $('ai-tags').innerHTML       = aiTags.map(t =>
-    `<span class="ai-tag" onclick="addSuggestedTag('${esc(t)}')">${esc(t)}</span>`
-  ).join('');
+  const tagContainer = $('ai-tags');
+  tagContainer.innerHTML = '';
+  aiTags.forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'ai-tag';
+    span.textContent = t;
+    span.addEventListener('click', () => addSuggestedTag(t));
+    tagContainer.appendChild(span);
+  });
   $('ai-result').style.display = '';
 }
 

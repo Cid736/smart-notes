@@ -34,12 +34,13 @@ router.put('/:id', (req, res) => {
   if (!existing) return res.status(404).json({ error: 'Not found' });
   if (req.body.content && Buffer.byteLength(req.body.content, 'utf8') > MAX_CONTENT_BYTES)
     return res.status(413).json({ error: 'Content too large (max 500KB)' });
-  db.update(req.params.id, { ...existing, ...req.body });
+  const { title, content, tags } = req.body;
+  db.update(req.params.id, { ...existing, title, content, tags });
   res.json(db.getOne(req.params.id));
 });
 
 router.post('/:id/summarize', (req, res) => {
-  const ip = req.headers['x-forwarded-for']?.split(',')[0].trim() || req.headers['x-real-ip'] || req.socket?.remoteAddress || 'unknown';
+  const ip = req.ip || req.socket?.remoteAddress || 'unknown';
   if (!_summarizeRateOk(ip)) return res.status(429).json({ error: 'Too many summarize requests' });
   const note = db.getOne(req.params.id);
   if (!note) return res.status(404).json({ error: 'Not found' });
