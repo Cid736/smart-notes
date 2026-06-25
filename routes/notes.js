@@ -35,7 +35,11 @@ router.put('/:id', (req, res) => {
   if (req.body.content && Buffer.byteLength(req.body.content, 'utf8') > MAX_CONTENT_BYTES)
     return res.status(413).json({ error: 'Content too large (max 500KB)' });
   const { title, content, tags } = req.body;
-  db.update(req.params.id, { ...existing, title, content, tags });
+  const updates = {};
+  if (title    !== undefined) updates.title   = title;
+  if (content  !== undefined) updates.content = content;
+  if (tags     !== undefined) updates.tags    = tags;
+  db.update(req.params.id, { ...existing, ...updates });
   res.json(db.getOne(req.params.id));
 });
 
