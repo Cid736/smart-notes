@@ -49,6 +49,12 @@ Type `[[Note Title]]` anywhere in your note. In preview mode it renders as a cli
 **v0.1.0** — 2026-05-01
 - Initial release: Markdown editor, WikiLinks, graph view, backlinks, AI summarization, tags
 
+## Security
+
+Automated security reviews are powered by [Claude](https://claude.ai) (Anthropic AI) and run on every significant change to detect vulnerabilities, insecure patterns and dependency risks. Findings are tracked in `BUGLOG.md`.
+
+Found a vulnerability? Open an issue or contact directly.
+
 ---
 
 <a name="español"></a>
@@ -80,6 +86,11 @@ npm start
 # Abre http://localhost:3001
 ```
 
+## Seguridad
+
+Las revisiones de seguridad automatizadas utilizan [Claude](https://claude.ai) (Anthropic AI) y se ejecutan en cada cambio significativo para detectar vulnerabilidades, patrones inseguros y riesgos en dependencias. Los hallazgos se registran en `BUGLOG.md`.
+
+¿Encontraste una vulnerabilidad? Abre un issue o contacta directamente.
 ## Licencia
 
 MIT
