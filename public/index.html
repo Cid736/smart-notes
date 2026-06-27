@@ -422,12 +422,22 @@ let graphIsInterval = false;
 const $  = id => document.getElementById(id);
 const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 
+// API key is injected server-side into a meta tag so it never appears in source
+const _apiKey = document.querySelector('meta[name="x-api-key"]')?.content || '';
+
 async function api(method, path, body) {
   const r = await fetch('/api/notes' + path, {
     method,
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Api-Key': _apiKey,
+    },
     body: body ? JSON.stringify(body) : undefined,
   });
+  if (r.status === 401) {
+    console.error('API auth failed — check API_KEY in .env');
+    return null;
+  }
   return r.status === 204 ? null : r.json();
 }
 

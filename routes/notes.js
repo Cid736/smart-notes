@@ -17,7 +17,15 @@ function _summarizeRateOk(ip) {
 }
 
 router.get('/graph',      (req, res) => res.json(db.getGraph()));
-router.get('/',           (req, res) => res.json(req.query.q ? db.search(req.query.q) : db.getAll()));
+router.get('/', (req, res) => {
+  const q = req.query.q;
+  if (q !== undefined) {
+    if (typeof q !== 'string' || q.length > 200)
+      return res.status(400).json({ error: 'Query too long (max 200 chars)' });
+    return res.json(db.search(q));
+  }
+  res.json(db.getAll());
+});
 router.post('/', (req, res) => {
   if (!req.body.title?.trim()) return res.status(400).json({ error: 'title is required' });
   if (req.body.content && Buffer.byteLength(req.body.content, 'utf8') > MAX_CONTENT_BYTES)

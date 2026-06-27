@@ -53,7 +53,13 @@ Type `[[Note Title]]` anywhere in your note. In preview mode it renders as a cli
 
 Automated security reviews are powered by [Claude](https://claude.ai) (Anthropic AI) and run on every significant change to detect vulnerabilities, insecure patterns and dependency risks. Findings are tracked in [`BUGLOG.md`](BUGLOG.md).
 
-**Last review:** 2026-06-25 — 3 issues found (1 medium, 2 low) — all patched. Set API_KEY in .env to enable auth.
+**Last review:** 2026-06-28 — 3 issues found (1 high, 2 low) — all patched.
+
+| Severity | File | Finding | Status |
+|----------|------|---------|--------|
+| HIGH | `public/index.html` | Auth bypass — the browser `api()` helper never sent the `X-Api-Key` header, so all API calls from the frontend got 401. The API key is now injected server-side as a `<meta name="x-api-key">` tag and read at runtime by the JS client. | Patched |
+| LOW | `db.js` | `notes.db` opened with a relative path — if the process CWD differed from the project root the database would be created in the wrong location. Fixed: path is now resolved relative to `__dirname`. | Patched |
+| LOW | `routes/notes.js` | Unbounded search query — no length limit on `?q=` parameter, allowing very large LIKE queries. Fixed: queries longer than 200 chars are rejected with HTTP 400. | Patched |
 
 Found a vulnerability? Open an issue or contact directly.
 
@@ -92,7 +98,13 @@ npm start
 
 Las revisiones de seguridad automatizadas utilizan [Claude](https://claude.ai) (Anthropic AI) y se ejecutan en cada cambio significativo para detectar vulnerabilidades, patrones inseguros y riesgos en dependencias. Los hallazgos se registran en [`BUGLOG.md`](BUGLOG.md).
 
-**Última revisión:** 2026-06-25 (rev 3) — 4 vulnerabilidades totales (1 media, 3 bajas) — todas parcheadas. Revisión 3: rate limiter de `/summarize` corregido para entornos con reverse proxy. Configurar API_KEY en .env para activar la autenticación.
+**Última revisión:** 2026-06-28 — 3 vulnerabilidades encontradas (1 alta, 2 bajas) — todas parcheadas.
+
+| Severidad | Archivo | Hallazgo | Estado |
+|-----------|---------|---------|--------|
+| ALTA | `public/index.html` | Bypass de autenticación — el helper `api()` del navegador nunca enviaba la cabecera `X-Api-Key`, por lo que todas las llamadas API desde el frontend recibían 401. La API key ahora se inyecta en servidor como `<meta name="x-api-key">` y el cliente JS la lee en tiempo de ejecución. | Parcheado |
+| BAJA | `db.js` | `notes.db` se abría con ruta relativa — si el CWD del proceso difería del directorio del proyecto, la base de datos se creaba en un lugar incorrecto. Fix: ruta resuelta con `__dirname`. | Parcheado |
+| BAJA | `routes/notes.js` | Consulta de búsqueda sin límite de longitud — sin límite en `?q=`, permitiendo queries LIKE muy largas. Fix: queries superiores a 200 caracteres rechazadas con HTTP 400. | Parcheado |
 
 ¿Encontraste una vulnerabilidad? Abre un issue o contacta directamente.
 ## Licencia
